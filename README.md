@@ -12,3 +12,4 @@ https://codepen.io/eirikbirkeland/pen/BPMPrp
 
 ## Gameplay
 ![gameplay animation](gameplay_anim.gif)
+Notice the subtle and intriguing bugs stemming from poor collision detection.
