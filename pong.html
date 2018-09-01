@@ -1,0 +1,261 @@
+<head>
+	<style>
+		body {
+			background-color: black;
+		}
+	</style>
+</head>
+<body>
+<div id="root">
+  
+</div>
+<script>
+	const CANVAS_WIDTH = 800;
+	const CANVAS_HEIGHT = 500;
+	const CANVAS_PADDING = 20;
+
+	const BOARD_OUTLINE_THICKNESS = 20;
+	const BOARD_START_X = BOARD_OUTLINE_THICKNESS;
+	const BOARD_START_Y = BOARD_OUTLINE_THICKNESS;
+
+	const PADDLE_SPEED = 5;
+	const PADDLE_HEIGHT = 80;
+	const PADDLE_WIDTH = 20;
+
+	const BALL_RADIUS = 5;
+	const BALL_DIAMETER = BALL_RADIUS * 2;
+	const LEVEL_PADDING = 3;
+
+	let downArrowKeyIsDepressed;
+	let upArrowKeyIsDepressed;
+	let wKeyIsDepressed;
+	let sKeyIsDepressed;
+
+	window.addEventListener("keydown", e => {
+	  e.preventDefault();
+	  downArrowKeyIsDepressed = e.which === 40;
+	  upArrowKeyIsDepressed = e.which === 38;
+	});
+
+	window.addEventListener("keyup", e => {
+	  e.preventDefault();
+	  downArrowKeyIsDepressed = !e.which === 40;
+	  upArrowKeyIsDepressed = !e.which === 38;
+	});
+
+	window.addEventListener("keydown", e => {
+	  e.preventDefault();
+	  wKeyIsDepressed = e.which === 87;
+	  sKeyIsDepressed = e.which === 83;
+	});
+
+	window.addEventListener("keyup", e => {
+	  e.preventDefault();
+	  wKeyIsDepressed = !e.which === 87;
+	  sKeyIsDepressed = !e.which === 83;
+	});
+
+	class Paddle {
+	  constructor(side) {
+		this.side = side;
+		this.X = this.side === "left" ? 20 : CANVAS_WIDTH - 20;
+		this.Y = CANVAS_HEIGHT / 2;
+		this.previousY = null;
+		this.direction = Boolean(Math.round(Math.random())) ? "up" : "down";
+	  }
+
+	  moveUp() {
+		this.previousY = this.Y;
+		this.Y -= PADDLE_SPEED;
+	  }
+
+	  moveDown() {
+		this.previousY = this.Y;
+		this.Y += PADDLE_SPEED;
+	  }
+
+	  render() {
+		if (this.Y >= CANVAS_HEIGHT) {
+		  this.direction = "up";
+		} else if (this.Y <= 0) {
+		  this.direction = "down";
+		}
+
+		ctx.clearRect(this.X, this.previousY, 20, PADDLE_HEIGHT);
+
+		ctx.fillStyle = "rgb(0,200,0)";
+		ctx.fillRect(this.X, this.Y, 20, PADDLE_HEIGHT);
+		ctx.restore();
+	  }
+	}
+
+	class Ball {
+	  constructor({ color }) {
+		this.X = CANVAS_WIDTH / 2;
+		this.Y = CANVAS_HEIGHT / 2;
+		this.previousX = null;
+		this.increment = 2;
+		this.color = color;
+		this.directionX = "left";
+		this.directionY = "up";
+	  }
+
+	  prepareNextMovement(directionX) {
+		if (directionX) this.directionX = directionX;
+
+		if (this.Y <= BOARD_START_Y + BALL_RADIUS) {
+		  this.directionY = "down";
+		} else if (this.Y >= CANVAS_HEIGHT - BOARD_START_Y - BALL_RADIUS) {
+		  this.directionY = "up";
+		}
+
+		this.previousX = this.X;
+		if (this.directionX === "left") {
+		  this.X -= this.increment;
+		} else if (this.directionX === "right") {
+		  this.X += this.increment;
+		}
+
+		this.previousY = this.Y;
+		if (this.directionY === "up") {
+		  this.Y -= this.increment;
+		} else if (this.directionY === "down") {
+		  this.Y += this.increment;
+		}
+	  }
+
+	  render() {
+		ctx.beginPath();
+		ctx.fillStyle = this.color;
+		ctx.arc(this.X, this.Y, BALL_DIAMETER, 0, 2 * Math.PI, false);
+		ctx.closePath();
+		ctx.fill();
+	  }
+	}
+
+	class Score {
+	  constructor() {
+		this.scoreLeft = 0;
+		this.scoreRight = 0;
+	  }
+	  incrementLeft() {
+		this.scoreLeft += 1;
+	  }
+	  incrementRight() {
+		this.scoreRight += 1;
+	  }
+	  get highestScore() {
+		return this.scoreLeft > this.scoreRight ? this.scoreLeft : this.scoreRight;
+	  }
+
+	  render() {
+		const str = this.scoreLeft + " - " + this.scoreRight;
+		const textX = CANVAS_WIDTH / 2 - str.length / 2 * 15;
+		ctx.font = "30px Arial";
+		ctx.fillStyle = "white";
+		ctx.clearRect(textX - 100, CANVAS_PADDING, str.length * 40, 30);
+		ctx.fillText(str, textX, CANVAS_PADDING + 25);
+	  }
+	}
+
+	class Border {
+	  constructor() {}
+	  render() {
+		// ctx.clearRect(this.X, this.previousY, 20, PADDLE_HEIGHT);
+		ctx.fillStyle = "rgb(255,255,255)";
+		ctx.fillRect(0, 0, CANVAS_WIDTH, BOARD_OUTLINE_THICKNESS);
+		ctx.fillRect(0, CANVAS_HEIGHT - BOARD_OUTLINE_THICKNESS, CANVAS_WIDTH, BOARD_OUTLINE_THICKNESS);
+		ctx.restore();
+	  }
+	}
+
+	let paddleLeft;
+	let paddleRight;
+	let ball;
+	let score;
+
+	function init() {
+	  paddleLeft = new Paddle("left", true);
+	  paddleRight = new Paddle("right", false);
+	  ball = new Ball({ color: "white" });
+	  score = new Score();
+	  border = new Border();
+	}
+
+	class Board {
+	  constructor() {
+		
+	  }
+	  static clear() {
+		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	  }
+	}
+
+	function restart() {
+	  ball = null;
+	  ball = new Ball({ color: "white" });
+	  setTimeout(() => requestAnimationFrame(gameLoop));
+	}
+
+	function gameLoop() {
+	  Board.clear();
+	  
+	  if (score.highestScore >= 10) {
+		return;
+	  }
+	  
+	  if (ball.X <= LEVEL_PADDING + BALL_RADIUS) {
+		score.incrementRight();
+		score.render();
+		return restart();
+	  } else if (ball.X >= CANVAS_WIDTH - LEVEL_PADDING - BALL_RADIUS) {
+		score.incrementLeft();
+		score.render();
+		return restart();
+	  }
+
+	  if (wKeyIsDepressed && paddleLeft.Y > 0) {
+		paddleLeft.moveUp();
+	  } else if (sKeyIsDepressed && paddleLeft.Y < CANVAS_HEIGHT - 80) {
+		paddleLeft.moveDown();
+	  } else if (upArrowKeyIsDepressed && paddleRight.Y > 0) {
+		paddleRight.moveUp();
+	  } else if (downArrowKeyIsDepressed && paddleRight.Y < CANVAS_HEIGHT - 80) {
+		paddleRight.moveDown();
+	  }
+
+	  paddleLeft.render();
+	  paddleRight.render();
+	  border.render();
+	  
+	  if (
+		(ball.X <= paddleLeft.X + 30 &&
+		  ball.Y >= paddleLeft.Y - 60 &&
+		  ball.Y <= paddleLeft.Y + 60) ||
+		(ball.X >= paddleRight.X - 15 &&
+		  ball.Y <= paddleRight.Y + 60 &&
+		  ball.Y >= paddleRight.Y - 60)
+	  ) {
+		console.warn("smack!");
+		ball.prepareNextMovement(ball.directionX === "left" ? "right" : "left");
+	  } else {
+		ball.prepareNextMovement();
+	  }
+	  score.render();
+	  ball.render();
+
+	  requestAnimationFrame(gameLoop);
+	}
+
+	const canvas = document.createElement('canvas');
+	canvas.width = CANVAS_WIDTH;
+	canvas.height = CANVAS_HEIGHT;
+	canvas.id = "myCanvas";
+	document.getElementById('root').appendChild(canvas);
+	const ctx = canvas.getContext("2d");
+
+	init();
+	gameLoop();
+</script>
+
+</body>
