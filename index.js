@@ -7,6 +7,8 @@ import Score from './lib/Score';
 import Border from './lib/Border';
 import Board from './lib/Board';
 
+let debug = true;
+
 const canvas = document.createElement('canvas');
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
@@ -99,13 +101,13 @@ function gameLoop() {
 
     if (
         (ball.X <= paddleLeft.X + 30 &&
-            ball.Y >= paddleLeft.Y - 60 &&
-            ball.Y <= paddleLeft.Y + 60) ||
+            ball.Y >= paddleLeft.center.Y() - (paddleLeft.height/2) &&
+            ball.Y <= paddleLeft.center.Y() + (paddleLeft.height/2)) ||
         (ball.X >= paddleRight.X - 15 &&
-            ball.Y <= paddleRight.Y + 60 &&
-            ball.Y >= paddleRight.Y - 60)
+            ball.Y <= paddleRight.center.Y() + paddleRight.height/2 &&
+            ball.Y >= paddleRight.center.Y() - paddleRight.height/2)
     ) {
-        console.warn("smack!");
+        console.info("smack!");
         ball.prepareNextMovement(ball.direction.X === "left" ? "right" : "left");
     } else {
         ball.prepareNextMovement();

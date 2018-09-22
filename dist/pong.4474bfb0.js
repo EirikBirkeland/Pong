@@ -146,14 +146,30 @@ var CANVAS_WIDTH = CONSTANTS.CANVAS_WIDTH,
     PADDLE_HEIGHT = CONSTANTS.PADDLE_HEIGHT,
     PADDLE_SPEED = CONSTANTS.PADDLE_SPEED;
 
+
+var debug = true;
+
 var Paddle = function () {
     function Paddle(ctx, side) {
+        var _this = this;
+
         _classCallCheck(this, Paddle);
 
         this.ctx = ctx;
         this.side = side;
         this.X = this.side === "left" ? 20 : CANVAS_WIDTH - 20;
         this.Y = CANVAS_HEIGHT / 2;
+        this.width = 20;
+        this.height = PADDLE_HEIGHT;
+        this.center = {
+            X: function X() {
+                return _this.X + _this.width / 2;
+            },
+            Y: function Y() {
+                return _this.Y + _this.height / 2;
+            }
+        };
+
         this.previousY = null;
         this.direction = Boolean(Math.round(Math.random())) ? "up" : "down";
     }
@@ -173,7 +189,7 @@ var Paddle = function () {
     }, {
         key: "clean",
         value: function clean() {
-            this.ctx.clearRect(this.X, this.previousY, 20, PADDLE_HEIGHT);
+            this.ctx.clearRect(this.X, this.previousY, this.width, this.height);
         }
     }, {
         key: "render",
@@ -185,8 +201,15 @@ var Paddle = function () {
             }
 
             this.ctx.fillStyle = "rgb(0,200,0)";
-            this.ctx.fillRect(this.X, this.Y, 20, PADDLE_HEIGHT);
-            this.ctx.restore();
+            this.ctx.fillRect(this.X, this.Y, this.width, this.height);
+
+            if (debug) {
+                this.ctx.beginPath();
+                this.ctx.fillStyle = "red";
+                this.ctx.fillRect(this.center.X(), this.center.Y(), 3, 3);
+                this.ctx.closePath();
+                this.ctx.fill();
+            }
         }
     }]);
 
@@ -217,6 +240,9 @@ var CANVAS_WIDTH = CONSTANTS.CANVAS_WIDTH,
     BALL_RADIUS = CONSTANTS.BALL_RADIUS,
     BALL_DIAMETER = CONSTANTS.BALL_DIAMETER;
 
+
+var debug = true;
+
 var Ball = function () {
     function Ball(ctx, _ref) {
         var color = _ref.color;
@@ -234,16 +260,24 @@ var Ball = function () {
             X: "left",
             Y: "up"
         };
+        this.changedRecently = false;
     }
 
     _createClass(Ball, [{
         key: "prepareNextMovement",
         value: function prepareNextMovement(directionX) {
-            if (directionX) this.direction.X = directionX;
+            if (this.changedRecently) {
+                --this.changedRecently;
+            }
 
-            if (this.Y <= BOARD_START_Y + BALL_RADIUS) {
+            if (directionX && !this.changedRecently) {
+                this.direction.X = directionX;
+                this.changedRecently = 5;
+            };
+
+            if (this.isTouchingTop) {
                 this.direction.Y = "down";
-            } else if (this.Y >= CANVAS_HEIGHT - BOARD_START_Y - BALL_RADIUS) {
+            } else if (this.isTouchingBottom) {
                 this.direction.Y = "up";
             }
 
@@ -269,6 +303,24 @@ var Ball = function () {
             this.ctx.arc(this.X, this.Y, BALL_DIAMETER, 0, 2 * Math.PI, false);
             this.ctx.closePath();
             this.ctx.fill();
+
+            if (debug) {
+                this.ctx.beginPath();
+                this.ctx.fillStyle = "red";
+                this.ctx.fillRect(this.X, this.Y, 3, 3);
+                this.ctx.closePath();
+                this.ctx.fill();
+            }
+        }
+    }, {
+        key: "isTouchingTop",
+        get: function get() {
+            return this.Y <= BOARD_START_Y + BALL_RADIUS;
+        }
+    }, {
+        key: "isTouchingBottom",
+        get: function get() {
+            return this.Y >= CANVAS_HEIGHT - BOARD_START_Y - BALL_RADIUS;
         }
     }]);
 
@@ -461,6 +513,8 @@ var CANVAS_WIDTH = CONSTANTS.CANVAS_WIDTH,
     BOARD_OUTLINE_THICKNESS = CONSTANTS.BOARD_OUTLINE_THICKNESS;
 
 
+var debug = true;
+
 var canvas = document.createElement('canvas');
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
@@ -553,8 +607,8 @@ function gameLoop() {
     paddleRight.render();
     border.render();
 
-    if (ball.X <= paddleLeft.X + 30 && ball.Y >= paddleLeft.Y - 60 && ball.Y <= paddleLeft.Y + 60 || ball.X >= paddleRight.X - 15 && ball.Y <= paddleRight.Y + 60 && ball.Y >= paddleRight.Y - 60) {
-        console.warn("smack!");
+    if (ball.X <= paddleLeft.X + 30 && ball.Y >= paddleLeft.center.Y() - paddleLeft.height / 2 && ball.Y <= paddleLeft.center.Y() + paddleLeft.height / 2 || ball.X >= paddleRight.X - 15 && ball.Y <= paddleRight.center.Y() + paddleRight.height / 2 && ball.Y >= paddleRight.center.Y() - paddleRight.height / 2) {
+        console.info("smack!");
         ball.prepareNextMovement(ball.direction.X === "left" ? "right" : "left");
     } else {
         ball.prepareNextMovement();
@@ -596,7 +650,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '38445' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '33397' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 
