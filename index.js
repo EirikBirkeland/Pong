@@ -1,5 +1,5 @@
 import * as CONSTANTS from './lib/constants';
-const { CANVAS_WIDTH, CANVAS_HEIGHT, LEVEL_PADDING, BALL_RADIUS } = CONSTANTS;
+const { CANVAS_WIDTH, CANVAS_HEIGHT, LEVEL_PADDING, BALL_RADIUS, BOARD_OUTLINE_THICKNESS } = CONSTANTS;
 
 import Paddle from './lib/Paddle';
 import Ball from './lib/Ball';
@@ -80,11 +80,11 @@ function gameLoop() {
         return restart();
     }
 
-    if (wKeyIsDepressed && paddleLeft.Y > 0) {
+    if (wKeyIsDepressed && paddleLeft.Y > BOARD_OUTLINE_THICKNESS) {
         paddleLeft.moveUp();
     } else if (sKeyIsDepressed && paddleLeft.Y < CANVAS_HEIGHT - 80) {
         paddleLeft.moveDown();
-    } else if (upArrowKeyIsDepressed && paddleRight.Y > 0) {
+    } else if (upArrowKeyIsDepressed && paddleRight.Y > BOARD_OUTLINE_THICKNESS) {
         paddleRight.moveUp();
     } else if (downArrowKeyIsDepressed && paddleRight.Y < CANVAS_HEIGHT - 80) {
         paddleRight.moveDown();

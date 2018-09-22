@@ -161,7 +161,7 @@ var Paddle = function () {
     _createClass(Paddle, [{
         key: "moveUp",
         value: function moveUp() {
-            this.previousY = this.Y;w;
+            this.previousY = this.Y;
             this.Y -= PADDLE_SPEED;
         }
     }, {
@@ -451,11 +451,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-var PADDLE_SPEED = CONSTANTS.PADDLE_SPEED,
-    CANVAS_WIDTH = CONSTANTS.CANVAS_WIDTH,
+var CANVAS_WIDTH = CONSTANTS.CANVAS_WIDTH,
     CANVAS_HEIGHT = CONSTANTS.CANVAS_HEIGHT,
     LEVEL_PADDING = CONSTANTS.LEVEL_PADDING,
-    BALL_RADIUS = CONSTANTS.BALL_RADIUS;
+    BALL_RADIUS = CONSTANTS.BALL_RADIUS,
+    BOARD_OUTLINE_THICKNESS = CONSTANTS.BOARD_OUTLINE_THICKNESS;
 
 
 var canvas = document.createElement('canvas');
@@ -533,11 +533,11 @@ function gameLoop() {
         return restart();
     }
 
-    if (wKeyIsDepressed && paddleLeft.Y > 0) {
+    if (wKeyIsDepressed && paddleLeft.Y > BOARD_OUTLINE_THICKNESS) {
         paddleLeft.moveUp();
     } else if (sKeyIsDepressed && paddleLeft.Y < CANVAS_HEIGHT - 80) {
         paddleLeft.moveDown();
-    } else if (upArrowKeyIsDepressed && paddleRight.Y > 0) {
+    } else if (upArrowKeyIsDepressed && paddleRight.Y > BOARD_OUTLINE_THICKNESS) {
         paddleRight.moveUp();
     } else if (downArrowKeyIsDepressed && paddleRight.Y < CANVAS_HEIGHT - 80) {
         paddleRight.moveDown();
@@ -590,7 +590,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '33577' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '37951' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 
