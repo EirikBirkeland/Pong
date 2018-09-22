@@ -227,34 +227,37 @@ var Ball = function () {
         this.X = CANVAS_WIDTH / 2;
         this.Y = CANVAS_HEIGHT / 2;
         this.previousX = null;
+        this.previousY = null;
         this.increment = 2;
         this.color = color;
-        this.directionX = "left";
-        this.directionY = "up";
+        this.direction = {
+            X: "left",
+            Y: "up"
+        };
     }
 
     _createClass(Ball, [{
         key: "prepareNextMovement",
         value: function prepareNextMovement(directionX) {
-            if (directionX) this.directionX = directionX;
+            if (directionX) this.direction.X = directionX;
 
             if (this.Y <= BOARD_START_Y + BALL_RADIUS) {
-                this.directionY = "down";
+                this.direction.Y = "down";
             } else if (this.Y >= CANVAS_HEIGHT - BOARD_START_Y - BALL_RADIUS) {
-                this.directionY = "up";
+                this.direction.Y = "up";
             }
 
             this.previousX = this.X;
-            if (this.directionX === "left") {
+            if (this.direction.X === "left") {
                 this.X -= this.increment;
-            } else if (this.directionX === "right") {
+            } else if (this.direction.X === "right") {
                 this.X += this.increment;
             }
 
             this.previousY = this.Y;
-            if (this.directionY === "up") {
+            if (this.direction.Y === "up") {
                 this.Y -= this.increment;
-            } else if (this.directionY === "down") {
+            } else if (this.direction.Y === "down") {
                 this.Y += this.increment;
             }
         }
@@ -533,13 +536,16 @@ function gameLoop() {
         return restart();
     }
 
-    if (wKeyIsDepressed && paddleLeft.Y > BOARD_OUTLINE_THICKNESS) {
+    var BORDER_TOP_EDGE = BOARD_OUTLINE_THICKNESS + 5;
+    var BORDER_BOTTOM_EDGE = CANVAS_HEIGHT - 105;
+
+    if (wKeyIsDepressed && paddleLeft.Y > BORDER_TOP_EDGE) {
         paddleLeft.moveUp();
-    } else if (sKeyIsDepressed && paddleLeft.Y < CANVAS_HEIGHT - 80) {
+    } else if (sKeyIsDepressed && paddleLeft.Y < BORDER_BOTTOM_EDGE) {
         paddleLeft.moveDown();
-    } else if (upArrowKeyIsDepressed && paddleRight.Y > BOARD_OUTLINE_THICKNESS) {
+    } else if (upArrowKeyIsDepressed && paddleRight.Y > BORDER_TOP_EDGE) {
         paddleRight.moveUp();
-    } else if (downArrowKeyIsDepressed && paddleRight.Y < CANVAS_HEIGHT - 80) {
+    } else if (downArrowKeyIsDepressed && paddleRight.Y < BORDER_BOTTOM_EDGE) {
         paddleRight.moveDown();
     }
 
@@ -549,7 +555,7 @@ function gameLoop() {
 
     if (ball.X <= paddleLeft.X + 30 && ball.Y >= paddleLeft.Y - 60 && ball.Y <= paddleLeft.Y + 60 || ball.X >= paddleRight.X - 15 && ball.Y <= paddleRight.Y + 60 && ball.Y >= paddleRight.Y - 60) {
         console.warn("smack!");
-        ball.prepareNextMovement(ball.directionX === "left" ? "right" : "left");
+        ball.prepareNextMovement(ball.direction.X === "left" ? "right" : "left");
     } else {
         ball.prepareNextMovement();
     }
@@ -590,7 +596,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '37951' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '38445' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 

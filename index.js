@@ -80,13 +80,16 @@ function gameLoop() {
         return restart();
     }
 
-    if (wKeyIsDepressed && paddleLeft.Y > BOARD_OUTLINE_THICKNESS) {
+    const BORDER_TOP_EDGE = BOARD_OUTLINE_THICKNESS + 5;
+    const BORDER_BOTTOM_EDGE = CANVAS_HEIGHT - 105;
+    
+    if (wKeyIsDepressed && paddleLeft.Y > BORDER_TOP_EDGE) {
         paddleLeft.moveUp();
-    } else if (sKeyIsDepressed && paddleLeft.Y < CANVAS_HEIGHT - 80) {
+    } else if (sKeyIsDepressed && paddleLeft.Y < BORDER_BOTTOM_EDGE) {
         paddleLeft.moveDown();
-    } else if (upArrowKeyIsDepressed && paddleRight.Y > BOARD_OUTLINE_THICKNESS) {
+    } else if (upArrowKeyIsDepressed && paddleRight.Y > BORDER_TOP_EDGE) {
         paddleRight.moveUp();
-    } else if (downArrowKeyIsDepressed && paddleRight.Y < CANVAS_HEIGHT - 80) {
+    } else if (downArrowKeyIsDepressed && paddleRight.Y < BORDER_BOTTOM_EDGE) {
         paddleRight.moveDown();
     }
 
@@ -103,7 +106,7 @@ function gameLoop() {
             ball.Y >= paddleRight.Y - 60)
     ) {
         console.warn("smack!");
-        ball.prepareNextMovement(ball.directionX === "left" ? "right" : "left");
+        ball.prepareNextMovement(ball.direction.X === "left" ? "right" : "left");
     } else {
         ball.prepareNextMovement();
     }
