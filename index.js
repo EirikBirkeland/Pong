@@ -7,7 +7,7 @@ import Score from './lib/Score';
 import Border from './lib/Border';
 import Board from './lib/Board';
 
-let debug = true;
+window.debug = false;
 
 const canvas = document.createElement('canvas');
 canvas.width = CANVAS_WIDTH;

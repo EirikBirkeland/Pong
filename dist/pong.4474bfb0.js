@@ -146,9 +146,6 @@ var CANVAS_WIDTH = CONSTANTS.CANVAS_WIDTH,
     PADDLE_HEIGHT = CONSTANTS.PADDLE_HEIGHT,
     PADDLE_SPEED = CONSTANTS.PADDLE_SPEED;
 
-
-var debug = true;
-
 var Paddle = function () {
     function Paddle(ctx, side) {
         var _this = this;
@@ -239,9 +236,6 @@ var CANVAS_WIDTH = CONSTANTS.CANVAS_WIDTH,
     BOARD_START_Y = CONSTANTS.BOARD_START_Y,
     BALL_RADIUS = CONSTANTS.BALL_RADIUS,
     BALL_DIAMETER = CONSTANTS.BALL_DIAMETER;
-
-
-var debug = true;
 
 var Ball = function () {
     function Ball(ctx, _ref) {
@@ -513,7 +507,7 @@ var CANVAS_WIDTH = CONSTANTS.CANVAS_WIDTH,
     BOARD_OUTLINE_THICKNESS = CONSTANTS.BOARD_OUTLINE_THICKNESS;
 
 
-var debug = true;
+window.debug = false;
 
 var canvas = document.createElement('canvas');
 canvas.width = CANVAS_WIDTH;
@@ -650,7 +644,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '33397' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '40525' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 
